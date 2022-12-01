@@ -26,7 +26,7 @@ class HomeViewModel {
   @observable currency: CurrencyCode | undefined = undefined;
   @observable customer: Customer | undefined = undefined;
   @observable accountSummary: AccountSummary | undefined;
-  // @observable totalText: string = 'MX$ 559,069.63';
+
   private getCustomerUseCase: GetCustomerUseCase;
   private getAccountsUseCase: GetAccountSummaryByCurrencyUseCase;
 
@@ -63,10 +63,6 @@ class HomeViewModel {
   }
 
   async getAccountsByCurrencyCode() {
-    // if (!this.customer?.id || !this.currency) {
-    //   return;
-    // }
-
     this.setLoadingAccounts(true);
     try {
       const data = await this.getAccountsUseCase.run(
