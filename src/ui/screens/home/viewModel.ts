@@ -4,7 +4,7 @@ import {Customer} from 'domain/entities/Customer';
 import {GetCustomerUseCase} from 'domain/useCases/getCustomerUseCase';
 import {action, makeAutoObservable, observable} from 'mobx';
 
-export enum CurrencyCode {
+enum CurrencyCode {
   MXN = 'MXN',
   USD = 'USD',
   EUR = 'EUR',
@@ -12,15 +12,28 @@ export enum CurrencyCode {
 
 class HomeViewModel {
   private static instance: HomeViewModel;
-  @observable isLoading: boolean = false;
-  @observable currencyCode: CurrencyCode = CurrencyCode.EUR;
+
+  private currenciesMap: Map<number, CurrencyCode> = new Map([
+    [0, CurrencyCode.MXN],
+    [1, CurrencyCode.USD],
+    [2, CurrencyCode.EUR],
+  ]);
+
+  @observable isLoadingAccounts: boolean = false;
+  @observable isLoadingExpenses: boolean = false;
+  @observable CurrencyCodes = CurrencyCode;
+  @observable tabSelected: number = 0;
+  @observable currency: CurrencyCode | undefined = undefined;
   @observable customer: Customer | undefined = undefined;
   @observable accounts: Account[] = [];
+  @observable totalText: string = 'MX$ 559,069.63';
   private getCustomerUseCase: GetCustomerUseCase;
   private getAccountsUseCase: GetAccountsBycurrencyUseCase;
 
   constructor() {
     makeAutoObservable(this);
+
+    this.currency = this.currenciesMap.get(this.tabSelected);
     this.getCustomerUseCase = new GetCustomerUseCase();
     this.getAccountsUseCase = new GetAccountsBycurrencyUseCase();
   }
@@ -39,14 +52,18 @@ class HomeViewModel {
   }
 
   async getAccountsByCurrencyCode() {
-    this.setLoading(true);
+    if (!this.currency) {
+      return;
+    }
+
+    this.setLoadingAccounts(true);
     try {
-      const data = await this.getAccountsUseCase.run(this.currencyCode);
+      const data = await this.getAccountsUseCase.run(this.currency);
       this.setAccounts(data);
     } catch (error) {
       console.log('Error', error);
     } finally {
-      this.setLoading(false);
+      this.setLoadingAccounts(false);
     }
   }
 
@@ -56,9 +73,22 @@ class HomeViewModel {
   }
 
   @action
+  selectCurrencyByIndex(index: number) {
+    this.currency = this.currenciesMap.get(index)! || 0;
+    this.tabSelected = index;
+    this.getAccountsByCurrencyCode();
+  }
+
+  @action
   openNotificationsScreen() {
     // TODO: Navegar a screen notificaciones
     console.log('Navegar a notificaciones');
+  }
+
+  @action
+  openMovementsScreen() {
+    // TODO: Navegar a screen notificaciones
+    console.log('Navegar a movimientos');
   }
 
   setCustomer(customer: Customer) {
@@ -69,8 +99,12 @@ class HomeViewModel {
     this.accounts = accounts;
   }
 
-  setLoading(isLoading: boolean) {
-    this.isLoading = isLoading;
+  setLoadingAccounts(isLoadingAccounts: boolean) {
+    this.isLoadingAccounts = isLoadingAccounts;
+  }
+
+  setLoadingExpenses(isLoadingExpenses: boolean) {
+    this.isLoadingExpenses = isLoadingExpenses;
   }
 }
 

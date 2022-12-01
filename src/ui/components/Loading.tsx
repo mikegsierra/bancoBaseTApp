@@ -8,9 +8,9 @@ type LoadingProps = {
 
 const Loading = ({visible, title}: LoadingProps) => {
   return visible ? (
-    <View className="absolute top-0 bottom-0 right-0 left-0 bg-black flex-1 justify-center items-center opacity-70">
+    <View className="absolute top-0 bottom-0 right-0 left-0 bg-cover flex-1 justify-center items-center">
       <ActivityIndicator size="large" color="white" />
-      <Text className="text-white text-xl py-4">{title}</Text>
+      <Text className="text-white text-xl">{title}</Text>
     </View>
   ) : (
     <></>

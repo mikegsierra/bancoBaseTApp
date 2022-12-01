@@ -4,8 +4,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'primary-main': '#e88506',
-        'card-active': '#e5a134',
+        'primary-main': '#ee9700',
+        'primary-ligth': '#fcd86c',
+        'card-active': '#ebae41',
+        'dark-gray': '#5c5e5e',
+        'dark-blue': '#305a8e',
+        cover: 'rgba(0,0,0,0.3)',
       },
     },
   },

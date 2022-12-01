@@ -43,6 +43,7 @@ const AccountSelectorList = ({
         inactiveSlideScale={1}
         useScrollView={true}
         loop={false}
+        vertical={false}
         autoplay={false}
         onSnapToItem={index => onAccountIndexChange(index)}
         renderItem={({item}: CarouselAccountItem) => (
