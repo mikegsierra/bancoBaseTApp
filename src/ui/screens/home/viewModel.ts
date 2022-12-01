@@ -1,8 +1,8 @@
-import {GetAccountsBycurrencyUseCase} from './../../../domain/useCases/getAccountsByCurrencyUseCase';
-import {Account} from 'domain/entities/Account';
+import {GetAccountSummaryByCurrencyUseCase} from 'domain/useCases/getAccountSummaryByCurrencyUseCase';
 import {Customer} from 'domain/entities/Customer';
+import {AccountSummary} from 'domain/entities/AccountSummary';
 import {GetCustomerUseCase} from 'domain/useCases/getCustomerUseCase';
-import {action, makeAutoObservable, observable} from 'mobx';
+import {action, reaction, makeAutoObservable, observable} from 'mobx';
 
 enum CurrencyCode {
   MXN = 'MXN',
@@ -25,17 +25,28 @@ class HomeViewModel {
   @observable tabSelected: number = 0;
   @observable currency: CurrencyCode | undefined = undefined;
   @observable customer: Customer | undefined = undefined;
-  @observable accounts: Account[] = [];
-  @observable totalText: string = 'MX$ 559,069.63';
+  @observable accountSummary: AccountSummary | undefined;
+  // @observable totalText: string = 'MX$ 559,069.63';
   private getCustomerUseCase: GetCustomerUseCase;
-  private getAccountsUseCase: GetAccountsBycurrencyUseCase;
+  private getAccountsUseCase: GetAccountSummaryByCurrencyUseCase;
 
   constructor() {
     makeAutoObservable(this);
 
     this.currency = this.currenciesMap.get(this.tabSelected);
     this.getCustomerUseCase = new GetCustomerUseCase();
-    this.getAccountsUseCase = new GetAccountsBycurrencyUseCase();
+    this.getAccountsUseCase = new GetAccountSummaryByCurrencyUseCase();
+
+    this.getCustomerData();
+
+    reaction(
+      () => this.customer?.id,
+      val => {
+        if (val && this.currency) {
+          this.getAccountsByCurrencyCode();
+        }
+      },
+    );
   }
 
   public static getInstance(): HomeViewModel {
@@ -52,14 +63,17 @@ class HomeViewModel {
   }
 
   async getAccountsByCurrencyCode() {
-    if (!this.currency) {
-      return;
-    }
+    // if (!this.customer?.id || !this.currency) {
+    //   return;
+    // }
 
     this.setLoadingAccounts(true);
     try {
-      const data = await this.getAccountsUseCase.run(this.currency);
-      this.setAccounts(data);
+      const data = await this.getAccountsUseCase.run(
+        this.customer?.id!,
+        this.currency!,
+      );
+      this.setAccountSummary(data);
     } catch (error) {
       console.log('Error', error);
     } finally {
@@ -69,6 +83,7 @@ class HomeViewModel {
 
   @action
   selectAccountById(accountId: number) {
+    // TODO: buscar reporte de gastos por cuenta
     console.log('AccountId', accountId);
   }
 
@@ -95,8 +110,8 @@ class HomeViewModel {
     this.customer = customer;
   }
 
-  setAccounts(accounts: Account[]) {
-    this.accounts = accounts;
+  setAccountSummary(accountSummary: AccountSummary) {
+    this.accountSummary = accountSummary;
   }
 
   setLoadingAccounts(isLoadingAccounts: boolean) {

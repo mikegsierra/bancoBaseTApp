@@ -1,6 +1,6 @@
 import {AxiosHttpManager, HttpManager} from 'data/network/http';
 import {CustomerModel} from 'data/models/customerModel';
-import {AccountModel} from 'data/models/accountModel';
+import {AccountSummaryModel} from 'data/models/accountSummaryModel';
 
 export class CustomerService {
   private http: HttpManager;
@@ -14,11 +14,17 @@ export class CustomerService {
     return CustomerModel.fromJson(data);
   }
 
-  async getAccountsByCurrencyCode(
+  async getAccountSummaryByCurrency(
+    customerId: number,
     currencyCode: string = 'MXN',
-  ): Promise<AccountModel[]> {
-    const data = await this.http.get('/customers/1/accounts', {currencyCode});
+  ): Promise<AccountSummaryModel> {
+    const data = await this.http.get(
+      `/customers/${customerId}/account/summary`,
+      {
+        currencyCode,
+      },
+    );
 
-    return data.map((account: any) => AccountModel.fromJson(account));
+    return AccountSummaryModel.fromJson(data);
   }
 }

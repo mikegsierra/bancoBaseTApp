@@ -1,7 +1,10 @@
-import {Account} from 'domain/entities/Account';
+import {AccountSummary} from 'domain/entities/AccountSummary';
 import {Customer} from 'domain/entities/Customer';
 
 export interface CustomerRepository {
   getCustomerById(): Promise<Customer>;
-  getAccountsByCurrencyCode(currencyCode: string): Promise<Account[]>;
+  getAccountSummaryByCurrency(
+    customerId: number,
+    currencyCode: string,
+  ): Promise<AccountSummary>;
 }

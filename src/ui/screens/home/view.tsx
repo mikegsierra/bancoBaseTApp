@@ -1,5 +1,5 @@
 import {observer} from 'mobx-react';
-import React, {useCallback, useEffect, useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {ScrollView, Text, View} from 'react-native';
 import AccountSelectorList from './components/AccountSelectorList';
 import Header from './components/Header';
@@ -15,11 +15,6 @@ import Section from 'ui/components/Section/Section';
 
 const Home = () => {
   const viewModel = useMemo(() => HomeViewModel.getInstance(), []);
-
-  useEffect(() => {
-    viewModel.getCustomerData();
-    viewModel.getAccountsByCurrencyCode();
-  }, [viewModel]);
 
   const onBellPress = () => viewModel.openNotificationsScreen();
   const onMovsPress = () => viewModel.openMovementsScreen();
@@ -74,18 +69,18 @@ const Home = () => {
 
             <View className="flex-col px-2 pt-4">
               <Text className="text-3xl font-semibold text-gray-800">
-                {viewModel.totalText}
+                {viewModel.accountSummary?.totalText}
               </Text>
               <Text className="text-base text-gray-600">
                 <Text>
-                  Balance actual de {viewModel.accounts.length} cuentas en{' '}
+                  Balance actual de {viewModel.accountSummary?.size} cuentas en{' '}
                 </Text>
                 <Text className="font-semibold">{viewModel.currency}</Text>
               </Text>
             </View>
 
             <AccountSelectorList
-              accounts={viewModel.accounts}
+              accounts={viewModel.accountSummary?.accounts || []}
               onAccountSelected={onAccountSelected}
             />
           </>

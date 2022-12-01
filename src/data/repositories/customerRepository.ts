@@ -1,6 +1,5 @@
-import {AccountModel} from 'data/models/accountModel';
 import {CustomerService} from 'data/services/customerService';
-import {Account} from 'domain/entities/Account';
+import {AccountSummary} from 'domain/entities/AccountSummary';
 import {Customer} from 'domain/entities/Customer';
 import {CustomerRepository} from 'domain/repositories/customerRepository';
 
@@ -16,9 +15,13 @@ export class CustomerRepositoryImpl implements CustomerRepository {
 
     return customer.toDomain();
   }
-  async getAccountsByCurrencyCode(currencyCode: string): Promise<Account[]> {
-    const accounts = await this.service.getAccountsByCurrencyCode(currencyCode);
-
-    return accounts.map((account: AccountModel) => account.toDomain());
+  async getAccountSummaryByCurrency(
+    customerId: number,
+    currencyCode: string,
+  ): Promise<AccountSummary> {
+    return await this.service.getAccountSummaryByCurrency(
+      customerId,
+      currencyCode,
+    );
   }
 }
