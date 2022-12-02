@@ -1,6 +1,7 @@
 import {CustomerService} from 'data/services/customerService';
 import {AccountSummary} from 'domain/entities/AccountSummary';
 import {Customer} from 'domain/entities/Customer';
+import {Expense} from 'domain/entities/Expense';
 import {CustomerRepository} from 'domain/repositories/customerRepository';
 
 export class CustomerRepositoryImpl implements CustomerRepository {
@@ -15,6 +16,7 @@ export class CustomerRepositoryImpl implements CustomerRepository {
 
     return customer.toDomain();
   }
+
   async getAccountSummaryByCurrency(
     customerId: number,
     currencyCode: string,
@@ -23,5 +25,12 @@ export class CustomerRepositoryImpl implements CustomerRepository {
       customerId,
       currencyCode,
     );
+  }
+
+  async getExpensesByAccountId(
+    accountId: number,
+    currencyCode: string,
+  ): Promise<Expense[]> {
+    return await this.service.getExpensesByAccount(accountId, currencyCode);
   }
 }

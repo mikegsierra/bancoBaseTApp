@@ -3,6 +3,9 @@ import {Customer} from 'domain/entities/Customer';
 import {AccountSummary} from 'domain/entities/AccountSummary';
 import {GetCustomerUseCase} from 'domain/useCases/getCustomerUseCase';
 import {action, reaction, makeAutoObservable, observable} from 'mobx';
+import {GetExpensesByAccountUseCase} from 'domain/useCases/getExpensesByAccountUseCase';
+import {Expense} from 'domain/entities/Expense';
+import ExpensePieData from 'ui/model/ExpensePieData';
 
 enum CurrencyCode {
   MXN = 'MXN',
@@ -26,9 +29,11 @@ class HomeViewModel {
   @observable currency: CurrencyCode | undefined = undefined;
   @observable customer: Customer | undefined = undefined;
   @observable accountSummary: AccountSummary | undefined;
+  @observable expensesPieData: ExpensePieData[] = [];
 
   private getCustomerUseCase: GetCustomerUseCase;
   private getAccountsUseCase: GetAccountSummaryByCurrencyUseCase;
+  private getExpensesUseCase: GetExpensesByAccountUseCase;
 
   constructor() {
     makeAutoObservable(this);
@@ -36,6 +41,7 @@ class HomeViewModel {
     this.currency = this.currenciesMap.get(this.tabSelected);
     this.getCustomerUseCase = new GetCustomerUseCase();
     this.getAccountsUseCase = new GetAccountSummaryByCurrencyUseCase();
+    this.getExpensesUseCase = new GetExpensesByAccountUseCase();
 
     this.getCustomerData();
 
@@ -44,6 +50,16 @@ class HomeViewModel {
       val => {
         if (val && this.currency) {
           this.getAccountsByCurrencyCode();
+        }
+      },
+    );
+
+    reaction(
+      () => this.accountSummary?.accounts,
+      val => {
+        if (val?.length! > 0 && this.currency) {
+          const firstAccount = val![0];
+          this.getExpensesByAccountId(firstAccount?.id!);
         }
       },
     );
@@ -77,10 +93,26 @@ class HomeViewModel {
     }
   }
 
+  async getExpensesByAccountId(accountId: number) {
+    this.setLoadingExpenses(true);
+    try {
+      const data = await this.getExpensesUseCase.run(accountId, this.currency!);
+      const expenses = this.mapExpensesToExpensesPieData(data);
+      this.setExpenses(expenses);
+    } catch (error) {
+      console.log('Error', error);
+    } finally {
+      this.setLoadingExpenses(false);
+    }
+  }
+
+  mapExpensesToExpensesPieData(expenese: Expense[]): ExpensePieData[] {
+    return expenese.map(e => ExpensePieData.fromExpense(e));
+  }
+
   @action
   selectAccountById(accountId: number) {
-    // TODO: buscar reporte de gastos por cuenta
-    console.log('AccountId', accountId);
+    this.getExpensesByAccountId(accountId);
   }
 
   @action
@@ -108,6 +140,10 @@ class HomeViewModel {
 
   setAccountSummary(accountSummary: AccountSummary) {
     this.accountSummary = accountSummary;
+  }
+
+  setExpenses(expensesPieData: ExpensePieData[]) {
+    this.expensesPieData = expensesPieData;
   }
 
   setLoadingAccounts(isLoadingAccounts: boolean) {

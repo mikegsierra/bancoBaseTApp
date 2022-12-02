@@ -86,9 +86,11 @@ const Home = () => {
           </>
         </Section>
 
-        <Section title="Gastos por categoría">
+        <Section
+          title="Gastos por categoría"
+          loading={viewModel.isLoadingExpenses}>
           <View className="flex-col px-4 pb-2">
-            <ExpensesReport />
+            <ExpensesReport data={viewModel.expensesPieData} />
 
             <ButtonBase title="Ver movimientos" onPress={onMovsPress} />
           </View>
