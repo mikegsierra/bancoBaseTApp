@@ -12,6 +12,8 @@ import ButtonBase from 'ui/components/ButtonBase';
 import Tabs from 'ui/components/Tabs/Tabs';
 import ExpensesReport from './components/ExpensesReport';
 import Section from 'ui/components/Section/Section';
+import Animated from 'react-native-reanimated';
+import Loading from 'ui/components/Loading';
 
 const Home = () => {
   const viewModel = useMemo(() => HomeViewModel.getInstance(), []);
@@ -67,7 +69,7 @@ const Home = () => {
               />
             </Tabs>
 
-            <View className="flex-col px-2 pt-4">
+            <Animated.View className="flex-col px-2 pt-4">
               <Text className="text-3xl font-semibold text-gray-800">
                 {viewModel.accountSummary?.totalText}
               </Text>
@@ -77,7 +79,7 @@ const Home = () => {
                 </Text>
                 <Text className="font-semibold">{viewModel.currency}</Text>
               </Text>
-            </View>
+            </Animated.View>
 
             <AccountSelectorList
               accounts={viewModel.accountSummary?.accounts || []}
@@ -88,7 +90,7 @@ const Home = () => {
 
         <Section
           title="Gastos por categoría"
-          loading={viewModel.isLoadingExpenses}>
+          loading={viewModel.isLoadingAccounts || viewModel.isLoadingExpenses}>
           <View className="flex-col px-4 pb-2">
             <ExpensesReport data={viewModel.expensesPieData} />
 
@@ -96,6 +98,11 @@ const Home = () => {
           </View>
         </Section>
       </ScrollView>
+
+      <Loading
+        visible={viewModel.isLoadingAccounts || viewModel.isLoadingExpenses}
+        title="Cargando…"
+      />
     </SafeAreaView>
   );
 };

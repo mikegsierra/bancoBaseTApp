@@ -9,7 +9,7 @@ module.exports = {
         'card-active': '#ebae41',
         'dark-gray': '#5c5e5e',
         'dark-blue': '#305a8e',
-        cover: 'rgba(0,0,0,0.3)',
+        cover: 'rgba(0,0,0,0.1)',
       },
     },
   },

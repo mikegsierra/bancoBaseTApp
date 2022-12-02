@@ -2,7 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 import SectionAction from './SectionAction';
 import SectionTitle from './SectionTitle';
-import Loading from '../Loading';
+import Animated, {FadeInDown} from 'react-native-reanimated';
 
 type SectionProps = {
   title: string;
@@ -12,8 +12,10 @@ type SectionProps = {
 };
 
 const Section = ({title, loading, children, action}: SectionProps) => {
-  return (
-    <View className="px-4 py-4 mt-6 bg-white">
+  return loading ? (
+    <></>
+  ) : (
+    <Animated.View className="px-4 py-4 mt-6 bg-white" entering={FadeInDown}>
       <View className="flex-row justify-between items-center mb-2">
         <SectionTitle title={title} />
 
@@ -21,9 +23,7 @@ const Section = ({title, loading, children, action}: SectionProps) => {
       </View>
 
       {children}
-
-      <Loading visible={loading!} title="Cargando…" />
-    </View>
+    </Animated.View>
   );
 };
 
